@@ -1,0 +1,352 @@
+
+----------------------------------------Experiment:  1 
+  Objects:  20 
+  Attributes:  20 
+Apriori
+
+Parameter specification:
+ confidence minval smax arem  aval originalSupport
+          1    0.1    1 none FALSE            TRUE
+ maxtime support minlen maxlen target   ext
+       5     0.1      2     10  rules FALSE
+
+Algorithmic control:
+ filter tree heap memopt load sort verbose
+    0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+
+Absolute minimum support count: 2 
+
+set item appearances ...[0 item(s)] done [0.00s].
+set transactions ...[20 item(s), 20 transaction(s)] done [0.00s].
+sorting and recoding items ... [20 item(s)] done [0.00s].
+creating transaction tree ... done [0.00s].
+checking subsets of size 1 2 3 4 5 6 7 8 9 done [0.00s].
+writing ... [7156 rule(s)] done [0.01s].
+creating S4 object  ... done [0.01s].
+Using parallel execution
+Processing batch
+--> composition : from 674 to 396 in 1.308 secs. 
+Batch took 1.323 secs. 
+Using parallel execution
+Processing batch
+--> composition : from 276 to 117 in 0.832 secs. 
+Batch took 0.842 secs. 
+_________________ Recommendation is: _______
+>>> Objects in the recommendation global:
+8 12
+>>> Closure in this iteration: 
+att1 att4 att6 att8 att13 att18 att20
+
+>>> Next attributes to explore in next iteration :
+att2 att3 att5 att7 att9 att10 att11 att12 att14 att15 att16 att17 att19
+>>> Rules in next iteration: 
+[1] 117
+
+_________________ Recommendation is: _______
+>>> Objects in the recommendation global:
+
+>>> Closure in this iteration: 
+
+
+>>> Next attributes to explore in next iteration :
+
+>>> Rules in next iteration: 
+FC NULL - no implications 
+
+_________________ End 1: _______
+>>> FCA null
+Tiempo
+5.539 2.724 13.124 0.057 3.469Preferencias
+
+----------------------------------------Experiment:  2 
+  Objects:  20 
+  Attributes:  25 
+Apriori
+
+Parameter specification:
+ confidence minval smax arem  aval originalSupport
+          1    0.1    1 none FALSE            TRUE
+ maxtime support minlen maxlen target   ext
+       5     0.1      2     10  rules FALSE
+
+Algorithmic control:
+ filter tree heap memopt load sort verbose
+    0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+
+Absolute minimum support count: 2 
+
+set item appearances ...[0 item(s)] done [0.00s].
+set transactions ...[25 item(s), 20 transaction(s)] done [0.00s].
+sorting and recoding items ... [25 item(s)] done [0.00s].
+creating transaction tree ... done [0.00s].
+checking subsets of size 1 2 3 4 5 6 7 8 9 10 done [0.01s].
+writing ... [25825 rule(s)] done [0.04s].
+creating S4 object  ... done [0.03s].
+Using parallel execution
+Processing batch
+--> composition : from 1673 to 802 in 2.208 secs. 
+Batch took 2.213 secs. 
+Using parallel execution
+Processing batch
+--> composition : from 652 to 303 in 1.269 secs. 
+Batch took 1.276 secs. 
+_________________ Recommendation is: _______
+>>> Objects in the recommendation global:
+2 20
+>>> Closure in this iteration: 
+att2 att3 att11 att15 att18 att22 att25
+
+>>> Next attributes to explore in next iteration :
+att1 att4 att5 att6 att7 att8 att9 att10 att12 att13 att14 att16 att17 att19 att20 att21 att23 att24
+>>> Rules in next iteration: 
+[1] 303
+
+_________________ Recommendation is: _______
+>>> Objects in the recommendation global:
+
+>>> Closure in this iteration: 
+
+
+>>> Next attributes to explore in next iteration :
+
+>>> Rules in next iteration: 
+FC NULL - no implications 
+
+_________________ End 1: _______
+>>> FCA null
+Tiempo
+5.218 2.23 10.773 0.028 3.261Preferencias
+
+----------------------------------------Experiment:  3 
+  Objects:  20 
+  Attributes:  30 
+Apriori
+
+Parameter specification:
+ confidence minval smax arem  aval originalSupport
+          1    0.1    1 none FALSE            TRUE
+ maxtime support minlen maxlen target   ext
+       5     0.1      2     10  rules FALSE
+
+Algorithmic control:
+ filter tree heap memopt load sort verbose
+    0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+
+Absolute minimum support count: 2 
+
+set item appearances ...[0 item(s)] done [0.00s].
+set transactions ...[30 item(s), 20 transaction(s)] done [0.00s].
+sorting and recoding items ... [30 item(s)] done [0.00s].
+creating transaction tree ... done [0.00s].
+checking subsets of size 1 2 3 4 5 6 7 8 9 10 done [0.03s].
+writing ... [270036 rule(s)] done [0.42s].
+creating S4 object  ... done [0.33s].
+Using parallel execution
+Processing batch
+--> composition : from 4812 to 1993 in 5.534 secs. 
+Batch took 5.539 secs. 
+Using parallel execution
+Processing batch
+--> composition : from 1850 to 1174 in 1.871 secs. 
+Batch took 1.876 secs. 
+_________________ Recommendation is: _______
+>>> Objects in the recommendation global:
+3 13 19
+>>> Closure in this iteration: 
+att8 att15 att18 att21 att23
+
+>>> Next attributes to explore in next iteration :
+att1 att2 att3 att4 att5 att6 att7 att9 att10 att11 att12 att13 att14 att16 att17 att19 att20 att22 att24 att25 att26 att27 att28 att29 att30
+>>> Rules in next iteration: 
+[1] 1174
+
+Using parallel execution
+Processing batch
+--> composition : from 928 to 267 in 1.37 secs. 
+Batch took 1.38 secs. 
+_________________ Recommendation is: _______
+>>> Objects in the recommendation global:
+13
+>>> Closure in this iteration: 
+att5 att6 att7 att9 att10 att14 att20 att22 att29
+
+>>> Next attributes to explore in next iteration :
+att1 att2 att3 att4 att11 att12 att13 att16 att17 att19 att24 att25 att26 att27 att28 att30
+>>> Rules in next iteration: 
+[1] 267
+
+_________________ Recommendation is: _______
+>>> Objects in the recommendation global:
+
+>>> Closure in this iteration: 
+
+
+>>> Next attributes to explore in next iteration :
+
+>>> Rules in next iteration: 
+FC NULL - no implications 
+
+_________________ End 1: _______
+>>> FCA null
+Tiempo
+13.495 3.793 22.477 0.055 5.178Preferencias
+
+----------------------------------------Experiment:  4 
+  Objects:  20 
+  Attributes:  35 
+Apriori
+
+Parameter specification:
+ confidence minval smax arem  aval originalSupport
+          1    0.1    1 none FALSE            TRUE
+ maxtime support minlen maxlen target   ext
+       5     0.1      2     10  rules FALSE
+
+Algorithmic control:
+ filter tree heap memopt load sort verbose
+    0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+
+Absolute minimum support count: 2 
+
+set item appearances ...[0 item(s)] done [0.00s].
+set transactions ...[35 item(s), 20 transaction(s)] done [0.00s].
+sorting and recoding items ... [35 item(s)] done [0.00s].
+creating transaction tree ... done [0.00s].
+checking subsets of size 1 2 3 4 5 6 7 8 9 10 done [0.64s].
+writing ... [348120 rule(s)] done [0.70s].
+creating S4 object  ... done [0.16s].
+Using parallel execution
+Processing batch
+--> composition : from 8182 to 3172 in 8.141 secs. 
+Batch took 8.149 secs. 
+Using parallel execution
+Processing batch
+--> composition : from 2738 to 1106 in 2.096 secs. 
+Batch took 2.102 secs. 
+_________________ Recommendation is: _______
+>>> Objects in the recommendation global:
+8 13
+>>> Closure in this iteration: 
+att2 att3 att10 att12 att13 att14 att21 att26 att27 att29
+
+>>> Next attributes to explore in next iteration :
+att1 att4 att5 att6 att7 att8 att9 att11 att15 att16 att17 att18 att19 att20 att22 att23 att24 att25 att28 att30 att31 att32 att33 att34 att35
+>>> Rules in next iteration: 
+[1] 1106
+
+_________________ Recommendation is: _______
+>>> Objects in the recommendation global:
+
+>>> Closure in this iteration: 
+
+
+>>> Next attributes to explore in next iteration :
+
+>>> Rules in next iteration: 
+FC NULL - no implications 
+
+_________________ End 1: _______
+>>> FCA null
+Tiempo
+16.225 3.257 24.309 0.051 4.625Preferencias
+
+----------------------------------------Experiment:  5 
+  Objects:  20 
+  Attributes:  40 
+Apriori
+
+Parameter specification:
+ confidence minval smax arem  aval originalSupport
+          1    0.1    1 none FALSE            TRUE
+ maxtime support minlen maxlen target   ext
+       5     0.1      2     10  rules FALSE
+
+Algorithmic control:
+ filter tree heap memopt load sort verbose
+    0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+
+Absolute minimum support count: 2 
+
+set item appearances ...[0 item(s)] done [0.00s].
+set transactions ...[40 item(s), 20 transaction(s)] done [0.00s].
+sorting and recoding items ... [40 item(s)] done [0.00s].
+creating transaction tree ... done [0.00s].
+checking subsets of size 1 2 3 4 5 6 7 8 9 10 done [1.53s].
+writing ... [1959744 rule(s)] done [1.96s].
+creating S4 object  ... done [1.26s].
+Using parallel execution
+Processing batch
+--> composition : from 14297 to 4972 in 13.33 secs. 
+Batch took 13.339 secs. 
+Using parallel execution
+Processing batch
+--> composition : from 4061 to 1342 in 2.904 secs. 
+Batch took 2.911 secs. 
+_________________ Recommendation is: _______
+>>> Objects in the recommendation global:
+16 20
+>>> Closure in this iteration: 
+att1 att2 att9 att10 att19 att22 att23 att31 att33 att35 att37 att39 att40
+
+>>> Next attributes to explore in next iteration :
+att3 att4 att5 att6 att7 att8 att11 att12 att13 att14 att15 att16 att17 att18 att20 att21 att24 att25 att26 att27 att28 att29 att30 att32 att34 att36 att38
+>>> Rules in next iteration: 
+[1] 1342
+
+Using parallel execution
+Processing batch
+--> composition : from 1262 to 706 in 1.711 secs. 
+Batch took 1.718 secs. 
+_________________ Recommendation is: _______
+>>> Objects in the recommendation global:
+16
+>>> Closure in this iteration: 
+att5 att11 att12 att16 att28
+
+>>> Next attributes to explore in next iteration :
+att3 att4 att6 att7 att8 att13 att14 att15 att17 att18 att20 att21 att24 att25 att26 att27 att29 att30 att32 att34 att36 att38
+>>> Rules in next iteration: 
+[1] 706
+
+_________________ Recommendation is: _______
+>>> Objects in the recommendation global:
+
+>>> Closure in this iteration: 
+
+
+>>> Next attributes to explore in next iteration :
+
+>>> Rules in next iteration: 
+FC NULL - no implications 
+
+_________________ End 1: _______
+>>> FCA null
+Tiempo
+57.181 7.766 76.085 0.101 7.951Preferencias
+
+----------------------------------------Experiment:  6 
+  Objects:  20 
+  Attributes:  45 
+Apriori
+
+Parameter specification:
+ confidence minval smax arem  aval originalSupport
+          1    0.1    1 none FALSE            TRUE
+ maxtime support minlen maxlen target   ext
+       5     0.1      2     10  rules FALSE
+
+Algorithmic control:
+ filter tree heap memopt load sort verbose
+    0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+
+Absolute minimum support count: 2 
+
+set item appearances ...[0 item(s)] done [0.00s].
+set transactions ...[45 item(s), 20 transaction(s)] done [0.00s].
+sorting and recoding items ... [45 item(s)] done [0.00s].
+creating transaction tree ... done [0.00s].
+checking subsets of size 1 2 3 4 5 6 7 8 9 10 done [1.14s].
+writing ... [2683127 rule(s)] done [3.58s].
+creating S4 object  ... done [1.40s].
+Using parallel execution
+Called from: parallel::mclapply(x, FUN, mc.cores = parallel::detectCores())
