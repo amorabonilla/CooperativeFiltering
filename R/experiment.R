@@ -128,6 +128,7 @@ return(list("recommendation_global"=objects_global,
 no_end_condition_experiment <- function(next_attributes,fcaR_fc,objects_global){
 #  browser()
 
+
   if  (is.null(fcaR_fc)) {
     cat("_________________ End 1: _______\n")
     cat(">>> FCA null\n")

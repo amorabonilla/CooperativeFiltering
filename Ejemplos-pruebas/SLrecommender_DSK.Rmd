@@ -1,0 +1,164 @@
+---
+title: "Cooperative Filetering with Disease-Symptom Knowledge Database"
+author: "P. Cordero, M. Enciso, A. Mora, M. Ojeda, C. Rossi"
+date: "11/2/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE, display=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+This experiment has been done using the dataset named **Disease-Symptom Knowledge Database**  containing  a list of diseases given to a set of symptoms.  See [http://people.dbmi.columbia.edu/~friedma/Projects/DiseaseSymptomKB/index.html](http://people.dbmi.columbia.edu/~friedma/Projects/DiseaseSymptomKB/index.html) for more information about the dataset. 
+The data in CSV format has been extracted from  [https://github.com/anaymalpani/sytora](https://github.com/anaymalpani/sytora).
+
+
+Firstly, a trace of the execution is showed and at the end of the document, it appears a summary of the results. 
+
+## Importing the dataset
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, display=FALSE}
+library(devtools)
+devtools::load_all()
+library(knitr)
+library(arules)
+library(fcaR)
+library(Matrix)
+
+
+library(tidyverse)
+library(pmml)
+library(sets)
+library(magrittr)
+# library("stringr")
+# library(data.table)
+# library(readxl)
+# #library(readr)
+
+library(foreach)
+library(doParallel)
+library(doSNOW)
+# library(foreach)
+
+#read_chunk("R/main.R")
+
+
+# setwd("/Volumes/GoogleDrive/Mi unidad/CooperativeFiltering")
+
+FC <- read.csv("/Volumes/GoogleDrive/Mi\ unidad/CooperativeFiltering/datasets/sytora-master/data/all-files-for-ml/all_pivoted.csv")
+
+
+
+head(FC[,1:24])
+
+rownames(FC) <- FC$Disease
+filas <- rownames(FC)
+
+FC$Disease <- NULL
+ 
+FC1 <-as.data.frame(sapply(FC, function(x) as.logical(x)))
+#View(head(FC1))
+rownames(FC1) <- filas
+
+```
+
+The size of the dataset is: 
+
+
+
+```{r}
+dim(FC)
+```
+
+## Extracting implications
+
+We extract the rules:
+```{r, echo=FALSE, warning=FALSE, message=FALSE, display=FALSE}
+my_support <- 0.005
+rule_param = list(
+  supp = my_support,
+  conf = 1,
+  maxlen = 30
+)
+
+Rules <- apriori(FC1,parameter = rule_param)
+name_file_rules <- "reglas_disease.xml"
+Rules
+
+Rules1 <- Rules[!is.redundant(Rules)]
+cat("Non-redundant rules:n")
+
+Rules1
+
+
+cat("Some rules:\n")
+inspect(tail(Rules1))
+
+dt_experiment_sizes <- data.frame(execution=c(),
+                                  experiment=c(),
+                                  iteration=c(),
+                                  sigma=c(),
+                                  #closure=c(),
+                                  attributes=c(),
+                                  objects=c(),
+                                  closure=c())
+
+
+
+num_execution <- 1
+num_experiment <- 1
+verbose <- TRUE
+
+# n number of users
+n_users=2
+num_scales <- 4
+
+number_executions_of_the_experiment <- 1000
+
+for (k in 1:number_executions_of_the_experiment){
+
+Rules <- Rules1
+ 
+recommendation <-    random_experiment_dataset(Rules,FC1,name_file_rules,
+                                              n_users,num_scales,
+                                              my_support,
+                                              num_execution,
+                                              num_experiment, verbose )
+
+dt_experiment_sizes <- rbind(dt_experiment_sizes,recommendation$pref_sizes )
+num_experiment <- num_experiment +1
+
+}
+dt_experiment_sizes$execution <- NULL
+ 
+dt_experiment_sizes
+write_csv(dt_experiment_sizes,"diseases_sizes")
+```
+ 
+ 
+The maximun number of diseases in the dataset is:
+```{r}
+max_objects <-dt_experiment_sizes$objects[1]
+max_objects
+```
+
+## Results
+
+After the execution of our method, we show a summary of the number of diseases identified in each step of the execution of our recommender system:
+
+```{r, echo=FALSE}
+summary_by_iteration <- dt_experiment_sizes %>%
+  rename(step =iteration) %>%
+  group_by(step) %>%
+  summarise(
+    n = n(),
+    max_objects = max(objects, na.rm = TRUE),
+  )  %>%
+  mutate(prunning_objects = 100-(max_objects/.GlobalEnv$max_objects)*100)
+
+summary_by_iteration
+```
+ 
+ 

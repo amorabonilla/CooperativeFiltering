@@ -9,8 +9,15 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 
 ```
+The CelebFaces Attributes (CelebA) Dataset data set  (over 200k images of celebrities with 40 binary attribute annotations).   This dataset is in [https://www.kaggle.com/jessicali9530/celeba-dataset](https://www.kaggle.com/jessicali9530/celeba-dataset)  and it is very used  for training and testing models for face detection, particularly for recognising facial attributes such as finding people with brown hair, are smiling, or wearing glasses.  The dimensions are 202599 rows (persons) and 40 columns (attributes, characteristics of a person).
 
-```{r}
+
+
+Firstly, a trace of the execution is showed and at the end of the document, it appears a summary of the results. 
+
+## Importing the dataset
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, display=FALSE}
 library(devtools)
 devtools::load_all()
 library(knitr)
@@ -38,7 +45,7 @@ library(doSNOW)
 
 # setwd("/Volumes/GoogleDrive/Mi unidad/CooperativeFiltering")
 
-FC <- read_csv("/Volumes/GoogleDrive/Mi unidad/CooperativeFiltering/datasets/list_attr_celeba.csv")
+FC <- read_csv("datasets/list_attr_celeba.csv")
 indicex <- FC==-1
 FC[indicex] <- 0
 
@@ -46,6 +53,21 @@ colnames(FC)
 filas <- rownames(FC)
 FC1 <-as.data.frame(sapply(FC[,2:41], function(x) as.logical(x)))
 #View(head(FC1))
+
+```
+
+The size of the dataset is: 
+
+
+
+```{r}
+dim(FC)
+```
+
+## Extracting implications
+
+We extract the rules:
+```{r, echo=FALSE, warning=FALSE, message=FALSE, display=FALSE}
 
 my_support <- 0.001
 rule_param = list(
@@ -84,7 +106,7 @@ verbose <- FALSE
 n_users=2
 num_scales <- 4
 
-number_executions_of_the_experiment <- 20
+number_executions_of_the_experiment <- 1000
 
 Rules <- apriori(FC1,parameter = rule_param)
 name_file_rules <- "reglas_celebA.xml"
@@ -115,26 +137,33 @@ Rules <- Rules1
 }
 dt_experiment_sizes$execution <- NULL
  
-
-
-```
- 
- 
- 
-```{r}
-dim(FC)
-#colSums(FC)
-#rowSums(FC)
-
-#sum(rowSums(FC))>10
-#sum(rowSums(FC))>15
-
-#sum(rowSums(FC))>18
-
-#sum(rowSums(FC))>20
 dt_experiment_sizes
-
-
+write_csv(dt_experiment_sizes,"celeb_sizes.csv")
 ```
+ 
+ 
+The maximun number of diseases in the dataset is:
+```{r}
+max_objects <-dt_experiment_sizes$objects[1]
+max_objects
+```
+
+## Results
+
+After the execution of our method, we show a summary of the number of diseases identified in each step of the execution of our recommender system:
+
+```{r, echo=FALSE}
+summary_by_iteration <- dt_experiment_sizes %>%
+  rename(step =iteration) %>%
+  group_by(step) %>%
+  summarise(
+    n = n(),
+    max_objects = max(objects, na.rm = TRUE),
+  )  %>%
+  mutate(prunning_objects = 100-(max_objects/.GlobalEnv$max_objects)*100)
+
+summary_by_iteration
+```
+ 
  
  

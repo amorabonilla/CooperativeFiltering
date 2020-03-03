@@ -1,0 +1,170 @@
+---
+title: "Cooperative Filetering with Human Phenotype Ontology Consortium Database"
+author: "P. Cordero, M. Enciso, A. Mora, M. Ojeda, C. Rossi"
+date: "11/2/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE, display=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+The source from which we have extracted the data is the Human Phenotype Ontology Consortium§ (HPO). As can be read in their web page: ‘HPO [41] aims to provide a standardized vocabulary of phenotypic abnormalities encountered in human disease. Each term in the HPO describes a phenotypic abnormality. The HPO is currently being developed using the medical literature, Orphanet, DECIPHER, and 
+OMIM . The HPO is developed within the context of the Monarch Initiative ’.
+The data in CSV format has the name of TB_1_2.csv in our repository.
+
+
+Firstly, a trace of the execution is showed and at the end of the document, it appears a summary of the results. 
+
+## Importing the dataset
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, display=FALSE}
+library(devtools)
+devtools::load_all()
+library(knitr)
+library(arules)
+library(fcaR)
+library(Matrix)
+
+
+library(tidyverse)
+library(pmml)
+library(sets)
+library(magrittr)
+# library("stringr")
+# library(data.table)
+# library(readxl)
+# #library(readr)
+
+library(foreach)
+library(doParallel)
+library(doSNOW)
+# library(foreach)
+
+#read_chunk("R/main.R")
+
+
+# setwd("/Volumes/GoogleDrive/Mi unidad/CooperativeFiltering")
+
+FC <- read.csv("/Volumes/GoogleDrive/Mi unidad/CooperativeFiltering/datasets/TB_1_2.csv", sep=";")
+
+colnames(FC)
+filas <- rownames(FC)
+rownames(FC) <- FC$DISEASE_ID
+FC$DISEASE_ID <- NULL
+
+FC1 <-as.data.frame(sapply(FC, function(x) as.logical(x)))
+#View(head(FC1))
+
+head(FC1)
+```
+
+The size of the dataset is: 
+
+
+
+```{r}
+dim(FC)
+```
+
+## Extracting implications
+
+We extract the rules:
+```{r, echo=FALSE, warning=FALSE, message=FALSE, display=FALSE}
+
+my_support <- 0.0095
+rule_param = list(
+  supp = my_support,
+  conf = 1,
+  maxlen = 25
+)
+
+Rules <- apriori(FC1,parameter = rule_param)
+
+
+#fc <-   FormalContext$new(FC)
+#fc$find_implications()
+
+name_file_rules <- "reglas_disease.xml"
+
+Rules1 <- Rules
+
+
+#Rules1 <- Rules[!is.redundant(Rules)]
+cat("Non-redundant rules:n")
+
+Rules1
+
+
+cat("Some rules:\n")
+inspect(tail(Rules1))
+
+dt_experiment_sizes <- data.frame(execution=c(),
+                                  experiment=c(),
+                                  iteration=c(),
+                                  sigma=c(),
+                                  #closure=c(),
+                                  attributes=c(),
+                                  objects=c(),
+                                  closure=c())
+
+
+
+num_execution <- 1
+num_experiment <- 1
+verbose <- TRUE
+
+# n number of users
+ 
+n_users=2
+num_scales <- 4
+
+number_executions_of_the_experiment <- 1000
+
+for (k in 1:number_executions_of_the_experiment){
+
+Rules <- Rules1
+ 
+recommendation <-    random_experiment_dataset(Rules,FC1,name_file_rules,
+                                              n_users,num_scales,
+                                              my_support,
+                                              num_execution,
+                                              num_experiment, verbose )
+
+dt_experiment_sizes <- rbind(dt_experiment_sizes,recommendation$pref_sizes )
+num_experiment <- num_experiment +1
+
+}
+dt_experiment_sizes$execution <- NULL
+ 
+dt_experiment_sizes
+write_csv(dt_experiment_sizes,"tbl1_sizes.csv")
+```
+ 
+ 
+The maximun number of diseases in the dataset is:
+```{r}
+max_objects <-dt_experiment_sizes$objects[1]
+max_objects
+```
+
+## Results
+
+After the execution of our method, we show a summary of the number of diseases identified in each step of the execution of our recommender system:
+
+```{r, echo=FALSE}
+summary_by_iteration <- dt_experiment_sizes %>%
+  rename(step =iteration) %>%
+  group_by(step) %>%
+  summarise(
+    n = n(),
+    max_objects = max(objects, na.rm = TRUE),
+  )  %>%
+  mutate(prunning_objects = 100-(max_objects/.GlobalEnv$max_objects)*100)
+
+summary_by_iteration
+```
+ 
+ 

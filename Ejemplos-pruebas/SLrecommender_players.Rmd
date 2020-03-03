@@ -1,5 +1,9 @@
 ---
+<<<<<<< HEAD
 title: "Experiment with Player dataset "
+=======
+title: "Experiment with dataset Players"
+>>>>>>> acf3aad41b22efb25907eee7c79372346834de47
 author: "P. Cordero, M. Enciso, A. Mora, C. Rossi"
 date: "12/2/2020"
 output: html_document

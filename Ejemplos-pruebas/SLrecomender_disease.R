@@ -112,3 +112,12 @@ Rules <- Rules1
 }
 dt_experiment_sizes$execution <- NULL
 dt_experiment_sizes
+
+
+
+summary(dt_experiment_sizes)
+
+#dt_experiment_sizes %>%
+#    lapply(dt_experiment_sizes, )
+
+

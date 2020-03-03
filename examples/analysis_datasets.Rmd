@@ -1,0 +1,564 @@
+---
+title: "Analisis of the datasets"
+author: "A. Mora"
+date: "24/2/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("~/Github/CooperativeFiltering")
+options(digits=2)
+```
+
+```{r}
+library(devtools)
+devtools::load_all()
+library(knitr)
+library(arules)
+library(fcaR)
+library(Matrix)
+
+
+library(tidyverse)
+library(pmml)
+library(sets)
+library(magrittr)
+# library("stringr")
+# library(data.table)
+# library(readxl)
+# #library(readr)
+
+library(foreach)
+library(doParallel)
+library(doSNOW)
+
+ 
+library(dplyr)
+library(readr)
+library(tidyr)
+ options(digits = 2)  
+ op = function(x, d=2) sprintf(paste0("%1.",d,"f"), x) 
+```
+
+
+# Analysis of results
+
+## Celeb dataset
+
+
+First, we prepare the summary with the results of the experiment:
+
+```{r}
+
+
+setwd("~/Github/CooperativeFiltering")
+celeb <- read_csv("datasets/list_attr_celeba.csv")
+ indicex <- celeb==-1
+celeb[indicex] <- 0
+
+rows_celeb <- dim(celeb)[1]
+ 
+
+celeb_sparsity <- sum(celeb == 0)/(dim(celeb)[1]*dim(celeb)[2])
+cat('Sparsity of the dataset:',celeb_sparsity)
+
+celeb_sizes <- read.csv("Ejemplos-pruebas/celeb_sizes_1000executions_attriubutes.csv")
+
+
+summary_by_iteration_celeb_sizes <- celeb_sizes %>%
+  rename(step =iteration) %>%
+  group_by(step) %>%
+  summarise(
+    n = n(),
+    max_objects = max(objects, na.rm = TRUE),
+  )  %>%
+  mutate(prunning_objects = 100-(max_objects/rows_celeb)*100)
+
+summary_by_iteration_celeb_sizes
+
+
+
+
+
+
+
+
+```
+
+
+
+
+## DSK dataset
+
+First, we prepare the summary with the results of the experiment:
+
+
+
+
+```{r}
+
+
+setwd("~/Github/CooperativeFiltering")
+DSK <- read.csv("datasets/all_pivoted.csv")
+DSK_sparsity <- sum(DSK == 0)/(dim(DSK)[1]*dim(DSK)[2])
+cat('Sparsity of the dataset:',DSK_sparsity)
+
+rows_DSK <- dim(DSK)[1]
+
+DSK_sizes <- read.csv("Ejemplos-pruebas/diseases_sizes_1000_attributes.csv")
+
+ 
+
+summary_by_iteration_DSK_sizes <- DSK_sizes %>%
+  rename(step =iteration) %>%
+  group_by(step) %>%
+  summarise(
+    n = n(),
+    max_objects = max(objects, na.rm = TRUE),
+  )  %>%
+  mutate(prunning_objects = 100-(max_objects/rows_DSK)*100)
+
+summary_by_iteration_DSK_sizes
+
+```
+
+
+
+## HPO dataset
+
+First, we prepare the summary with the results of the experiment:
+
+```{r}
+
+setwd("~/Github/CooperativeFiltering")
+
+HPO <- read.csv("datasets/TB_1_2.csv", sep=";")
+HPO_sparsity <- sum(HPO == 0)/(dim(HPO)[1]*dim(HPO)[2])
+cat('Sparsity of the dataset:',HPO_sparsity)
+
+rows_HPO <- dim(HPO)[1]
+
+HPO_sizes <- read.csv("Ejemplos-pruebas/tbl1_sizes_1000_attributes.csv")
+
+ 
+
+summary_by_iteration_HPO_sizes <- HPO_sizes %>%
+  rename(step =iteration) %>%
+  group_by(step) %>%
+  summarise(
+    n = n(),
+    max_objects = max(objects, na.rm = TRUE),
+  )  %>%
+  mutate(prunning_objects = 100-(max_objects/rows_HPO)*100)
+
+summary_by_iteration_HPO_sizes
+
+```
+
+
+
+## Length of the dialogue with users
+
+```{r, fig.width=15,fig.align="center"}
+# Source 
+# https://www.datanovia.com/en/blog/ggplot-multiple-plots-made-ridiculuous-simple-using-patchwork-r-package/
+
+library(ggplot2)
+library(patchwork)
+library(gridExtra)
+# 0. Define custom color palette and prepare the data
+my3cols <- c("#E7B800", "#2E9FDF", "#FC4E07")
+
+p_celeb <- ggplot(summary_by_iteration_celeb_sizes, aes(x=step, y = n))
+
+lp_celeb <- ggplot(summary_by_iteration_celeb_sizes, aes(x = step, y = n)) + 
+  geom_line(color = "#E46726") +
+  geom_label(aes(label = n), data = summary_by_iteration_celeb_sizes, nudge_y = 3, alpha = 0.5)+
+    labs(title = " Celebface dataset", x= " Number of steps", y="Number of simulations")
+
+p_DSK <- ggplot(summary_by_iteration_DSK_sizes, aes(x=step, y = n))
+
+ 
+
+lp_DSK <- ggplot(summary_by_iteration_DSK_sizes, aes(x = step, y = n)) + 
+  geom_line(color = "#FC4E07")+
+  geom_label(aes(label = n), data = summary_by_iteration_DSK_sizes, nudge_y = 3, alpha = 0.5)+
+    labs(title = "DSK dataset", x= " Number of steps", y="Number of simulations") 
+
+
+p_HPO <- ggplot(summary_by_iteration_HPO_sizes, aes(x=step, y = n))
+
+ 
+
+lp_HPO <- ggplot(summary_by_iteration_HPO_sizes, aes(x = step, y = n)) + 
+  geom_line(color = "#FC4E07")+
+  geom_label(aes(label = n), data = summary_by_iteration_HPO_sizes, nudge_y = 3, alpha = 0.5)+
+    labs(title = "HPO dataset", x= " Number of steps", y="Number of simulations") 
+
+lp_together <- lp_celeb + lp_DSK  + lp_HPO
+lp_together
+ 
+ggsave("experiment_len_dialogue.pdf",plot = lp_together)
+
+```
+
+
+## HPO comparison
+
+Comparing our results with Cooperative Filtering recommender with [Benito 2018].
+
+```{r}
+summary_by_iteration_HPO_sizes
+cat('Experiments finishing in  2 steps',(1000-456)/1000*100,"%")
+cat('Experiments finishing in 3 steps',(1000-(19))/1000*100,"%")
+cat('Experiments finishing in  4 steps',0,"%")
+
+
+```
+
+
+
+## Velocity of the recommendation
+
+The greater the amount of objects recommended in each step, the greater the velocity of the recommender. 
+
+```{r,fig.width=5, fig.height=10}
+
+
+summary_objects1 <- celeb_sizes %>%
+  rename(step =iteration) %>%
+  group_by(step) %>%
+  summarise(
+    n = n(),
+    mean_objects_celeb = mean(objects, na.rm = TRUE),
+  )   
+
+summary_objects1
+
+summary_objects2 <- DSK_sizes %>%
+  rename(step =iteration) %>%
+  group_by(step) %>%
+  summarise(
+    n = n(),
+    mean_objectsDSK = mean(objects, na.rm = TRUE)
+  )  
+
+summary_objects2
+
+
+
+summary_objects3 <- HPO_sizes %>%
+  rename(step =iteration) %>%
+  group_by(step) %>%
+  summarise(
+    n = n(),
+    mean_objectsHPO = mean(objects, na.rm = TRUE)
+  )  
+
+summary_objects2
+
+
+summary_objects <- summary_objects1 %>%
+  left_join(summary_objects2, by = "step")
+summary_objects
+ 
+  
+summary_objects <- summary_objects %>%
+  left_join(summary_objects3, by = "step") 
+
+
+summary_objects$mean_objects_celeb   %>% replace_na(0)
+  
+summary_objects$mean_objectsDSK   %>% replace_na(0)
+
+summary_objects$mean_objectsHPO   %>% replace_na(0)
+
+
+summary_objects
+
+
+ 
+
+lp_objects <- ggplot(summary_objects, aes(x = step, y =mean_objects_celeb )) + 
+  geom_line(color = "#FC4E07")+
+    labs(title = "celebA dataset", x= " Number of steps of the dialogue", y="Number of objects recommended") 
+  
+
+lp_objects2 <- ggplot(summary_objects, aes(x = step, y =mean_objectsDSK )) + 
+  geom_line(color = "#FC4E07")+
+    labs(title = "DSK dataset", x= " Number of steps of the dialogue", y="Number of objects recommended") 
+  
+lp_objects3 <- ggplot(summary_objects, aes(x = step, y =mean_objectsHPO )) + 
+  geom_line(color = "#FC4E07")+
+    labs(title = "HPO dataset", x= " Number of steps of the dialogue", y="Number of objects recommended") 
+  
+library(gridExtra)
+library(grid)
+
+table_summary_objects  <- summary_objects %>%
+  select(c(step,starts_with("mean")))%>% 
+  rename("celeb"=mean_objects_celeb)%>% 
+  rename("DSK"=mean_objectsDSK)%>% 
+  rename("HPO"=mean_objectsHPO)
+ 
+table_summary_objects <- table_summary_objects %>% replace(., is.na(.), 0)
+
+table_summary_objects <- formatC(as.matrix(table_summary_objects),digits = 0,format = "f")
+
+ 
+
+lp_objects_together <- lp_objects / lp_objects2    / lp_objects3 /  tableGrob(table_summary_objects, rows=NULL, cols = NULL)
+
+#lp_objects_together <- (lp_objects | lp_objects2   ) / (lp_objects3 |  tableGrob(table_summary_objects, rows=NULL, cols = NULL))
+
+lp_objects_together
+ 
+ggsave("experiment_objects.pdf",plot = lp_objects_together)
+ 
+ 
+  
+ 
+```
+
+
+## Attributes suggested to the user
+
+Finally we study the number of attributtes suggested to the user in each step of the dialogue.
+
+```{r,fig.width=5, fig.height=10}
+
+summary_attr1 <- celeb_sizes %>%
+  rename(step =iteration) %>%
+  group_by(step) %>%
+  summarise(
+     mean_attr_celeb = mean(attributes, na.rm = TRUE),
+  )   
+
+summary_attr2 <- DSK_sizes %>%
+  rename(step =iteration) %>%
+  group_by(step) %>%
+  summarise(
+     mean_attrDSK = mean(attributes, na.rm = TRUE),
+  )   
+summary_attr3 <- HPO_sizes %>%
+  rename(step =iteration) %>%
+  group_by(step) %>%
+  summarise(
+     mean_attrHPO = mean(attributes, na.rm = TRUE),
+  )   
+
+
+summary_attributes <- summary_attr1 %>%
+  left_join(summary_attr2, by = "step")
+summary_attributes
+ 
+  
+summary_attributes <- summary_attributes %>%
+  left_join(summary_attr3, by = "step") 
+
+
+table_summary_attributes <- summary_attributes %>% replace(., is.na(.), 0) 
+
+ 
+ 
+lp_attr1 <- ggplot(table_summary_attributes, aes(x = step, y =mean_attr_celeb )) + 
+  geom_line(color = "#FC4E07")+
+    labs(title = "celebA dataset", x= " Number of steps of the dialogue", y="Number of attributes suggested ") 
+  
+
+lp_attr2 <- ggplot(table_summary_attributes, aes(x = step, y =mean_attrDSK )) + 
+  geom_line(color = "#FC4E07")+
+    labs(title = "DSK dataset", x= " Number of steps of the dialogue", y="Number of attributes suggested") 
+  
+lp_attr3 <- ggplot(table_summary_attributes, aes(x = step, y =mean_attrHPO )) + 
+  geom_line(color = "#FC4E07")+
+    labs(title = "HPO dataset", x= " Number of steps of the dialogue", y="Number of attributes suggested") 
+  
+table_summary_attributes  <- table_summary_attributes %>%
+  select(c(step,starts_with("mean")))%>% 
+  rename("celeb"=mean_attr_celeb)%>% 
+  rename("DSK"=mean_attrDSK)%>% 
+  rename("HPO"=mean_attrHPO)
+
+table_summary_attributes <- formatC(as.matrix(table_summary_attributes),digits = 0,format = "f")
+
+#lp_attr_together <- (lp_attr1 | lp_attr2  | lp_attr3) / tableGrob(table_summary_attributes, rows=NULL, cols = NULL)
+
+lp_attr_together <- lp_attr1 / lp_attr2  / lp_attr3 / tableGrob(table_summary_attributes, rows=NULL, cols = NULL)
+
+lp_attr_together
+
+ 
+ggsave("experiment_attr.pdf",plot = lp_attr_together)
+
+```
+
+
+## General information of dataset
+
+
+
+We extract the rules:
+```{r}
+
+FC <- read_csv("/Volumes/GoogleDrive/Mi unidad/CooperativeFiltering/datasets/list_attr_celeba.csv")
+indicex <- FC==-1
+FC[indicex] <- 0
+
+colnames(FC)
+filas <- rownames(FC)
+FC1 <-as.data.frame(sapply(FC[,2:41], function(x) as.logical(x)))
+
+my_support <- 0.001
+rule_param = list(
+  supp = my_support,
+  conf = 1,
+  maxlen = 15
+) 
+celeb_rules <- apriori(FC1,parameter = rule_param)
+celeb_rules1 <- celeb_rules[!is.redundant(celeb_rules)]
+
+ 
+fc <- FormalContext$new(FC1)
+fc$implications$add(celeb_rules1)
+
+celeb_fc_left <- lhs.minimals(fc$implications)
+celeb_attributes_left <- celeb_fc_left@Dim[1]
+celeb_attributes_left     
+ 
+
+
+FC <- read.csv("/Volumes/GoogleDrive/Mi unidad/CooperativeFiltering/datasets/TB_1_2.csv", sep=";")
+
+colnames(FC)
+filas <- rownames(FC)
+rownames(FC) <- FC$DISEASE_ID
+FC$DISEASE_ID <- NULL
+
+FC1 <-as.data.frame(sapply(FC, function(x) as.logical(x)))
+#View(head(FC1))
+
+
+
+my_support <- 0.0095
+rule_param = list(
+  supp = my_support,
+  conf = 1,
+  maxlen = 25
+)
+
+HBO_rules <- apriori(FC1,parameter = rule_param)
+HBO_rules1 <- HBO_rules[!is.redundant(HBO_rules)]
+
+fc1 <- FormalContext$new(FC1)
+fc1$implications$add(HBO_rules1)
+
+HBO_f1_left <- lhs.minimals(fc1$implications)
+HBO_attributes_left <- HBO_f1_left@Dim[1]
+HBO_attributes_left   
+
+
+FC <- read.csv("/Volumes/GoogleDrive/Mi\ unidad/CooperativeFiltering/datasets/sytora-master/data/all-files-for-ml/all_pivoted.csv")
+
+
+
+head(FC[,1:24])
+
+rownames(FC) <- FC$Disease
+filas <- rownames(FC)
+
+FC$Disease <- NULL
+ 
+FC1 <-as.data.frame(sapply(FC, function(x) as.logical(x)))
+#View(head(FC1))
+
+my_support <- 0.005
+rule_param = list(
+  supp = my_support,
+  conf = 1,
+  maxlen = 30
+)
+
+DSK_rules <- apriori(FC1,parameter = rule_param)
+DSK_rules1 <- DSK_rules[!is.redundant(DSK_rules)]
+
+fc1 <- FormalContext$new(FC1)
+fc1$implications$add(DSK_rules1)
+
+DSK_f1_left <- lhs.minimals(fc1$implications)
+DSK_attributes_left <- DSK_f1_left@Dim[1]
+DSK_attributes_left   
+```
+ 
+
+```{r}
+
+datasets3 <- data.frame(celebA=c(dim(celeb)[2]),
+                        DSK=c(dim(DSK)[2]),
+                        HPO=c(dim(HPO)[2]))
+
+datasets3b <- data.frame(celebA=c(dim(celeb)[1]),
+                        DSK=c(dim(DSK)[1]),
+                        HPO=c(dim(HPO)[1]))
+
+datasets3c <- data.frame(celebA=c(format(celeb_sparsity,digits = 2)),
+                        DSK=c(format(DSK_sparsity,digits = 2)),
+                        HPO=c(format(HPO_sparsity,digits = 2)))
+
+
+datasets3d <- data.frame(celebA=c(length(celeb_rules1)),
+                        DSK=c(length(DSK_rules1)),
+                        HPO=c(length(HBO_rules1)))
+
+datasets3e <- data.frame(celebA=c(celeb_attributes_left),
+                        DSK=c(DSK_attributes_left),
+                        HPO=c(HBO_attributes_left))
+
+
+datasets3 <- rbind(datasets3,datasets3b)
+datasets3 <- rbind(datasets3,datasets3c)
+datasets3 <- rbind(datasets3,datasets3d)
+datasets3 <- rbind(datasets3,datasets3e)
+
+rownames(datasets3) <- c("Columns","Rows","Sparsity","Implications","Attr.Left")
+ 
+
+
+
+lp_summary <-  tableGrob(datasets3)
+
+
+
+ggsave("experiment_lp_summary.pdf",plot = lp_summary)
+
+                        
+```
+
+
+## Figure 7
+
+Comparison with [Benito 2018]:
+```{r}
+df_comparison <- data.frame("1 Step"=c(0,0),
+                        "2 Steps"=c(68,54.4),
+                        "3 Steps"=c(26,43.7),
+                        "4 Steps"=c(5,0),
+                        "5 Steps"=c(1,0)
+                        )
+
+colnames(df_comparison) <- c("1 Step","2 Steps","3 Steps","4 Steps","5 Steps")
+rownames(df_comparison) <- c("Benito2018","Cooper.Filt.")
+
+rownames(df_comparison)
+lp_comparison <-   tableGrob(df_comparison)
+
+  
+
+ 
+
+ggsave("experiment_lp_comparison.pdf",plot = lp_comparison)
+
+
+```
+

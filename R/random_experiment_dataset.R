@@ -87,7 +87,7 @@ random_experiment_dataset <- function(Rules, FC,name_file_rules,n_users,num_scal
                                          experiment=num_experiment,
                                          iteration=c(n_iteration),
                                          sigma=c(fcaR_fc$implications$cardinality()),
-                                         attributes=c(length(recommendation$evaluated_attributes)),
+                                         attributes=c(length(recommendation$next_attributes)),
                                          objects=length(objects_global),
                                          closure=length(attr_closure_accumulated))
 
